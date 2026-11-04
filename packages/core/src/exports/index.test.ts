@@ -96,6 +96,7 @@ test('exports', () => {
       "ConnectorUnavailableReconnectingError",
       "ProviderNotFoundError",
       "SwitchChainNotSupportedError",
+      "TransactionRevertedError",
       "custom",
       "http",
       "webSocket",

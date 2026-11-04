@@ -42,7 +42,9 @@ test('behavior: transaction reverted', async () => {
       hash: '0x745367f76807d411b7fa4c3a552a62e3e45303ef40145fff04d84b867c2575d3',
     }),
   ).rejects.toThrowErrorMatchingInlineSnapshot(`
-    [CallExecutionError: Execution reverted with reason: PartyBid::claim: contribution already claimed.
+    [TransactionRevertedError: Transaction with hash "0x745367f76807d411b7fa4c3a552a62e3e45303ef40145fff04d84b867c2575d3" reverted.
+
+    Details: Execution reverted with reason: PartyBid::claim: contribution already claimed.
 
     Raw Call Arguments:
       from:                  0xa0cf798816d4b9b9866b5330eea46a18382f251e
@@ -55,7 +57,8 @@ test('behavior: transaction reverted', async () => {
       nonce:                 43
 
     Details: execution reverted: PartyBid::claim: contribution already claimed
-    Version: viem@2.56.9]
+    Version: viem@2.56.9
+    Version: @wagmi/core@x.y.z]
   `)
 })
 
@@ -103,7 +106,7 @@ test('behavior: reverted transaction with hanging fallback reason lookup rejects
         () => ({ status: 'resolved' as const }),
         (error) => ({
           status: 'rejected' as const,
-          message: error instanceof Error ? error.message : String(error),
+          cause: (error as Error).cause,
         }),
       ),
     { timeout: 500 },
@@ -123,5 +126,8 @@ test('behavior: reverted transaction with hanging fallback reason lookup rejects
     { endpoint: 'primary', method: 'eth_call' },
     { endpoint: 'secondary', method: 'eth_call' },
   ])
-  expect(result).toEqual({ status: 'rejected', message: 'unknown reason' })
+  expect(result).toEqual({
+    status: 'rejected',
+    cause: new Error('unknown reason'),
+  })
 })

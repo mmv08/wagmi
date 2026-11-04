@@ -67,6 +67,21 @@ test('default', async () => {
   `)
 })
 
+test('behavior: does not retry a reverted transaction', async () => {
+  const { result } = await renderHook(() =>
+    useWaitForTransactionReceipt({
+      hash: '0x745367f76807d411b7fa4c3a552a62e3e45303ef40145fff04d84b867c2575d3',
+    }),
+  )
+
+  await vi.waitUntil(() => result.current.isError, { timeout: 5_000 })
+
+  expect(result.current.failureCount).toBe(1)
+  expect(result.current.error?.message).toContain(
+    'contribution already claimed',
+  )
+})
+
 test('disabled when hash is undefined', async () => {
   const { result } = await renderHook(() =>
     useWaitForTransactionReceipt({ hash: undefined }),

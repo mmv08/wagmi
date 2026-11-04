@@ -10,6 +10,10 @@ import {
 } from 'viem/actions'
 
 import type { Config } from '../createConfig.js'
+import {
+  TransactionRevertedError,
+  type TransactionRevertedErrorType,
+} from '../errors/transaction.js'
 import type { SelectChains } from '../types/chain.js'
 import type { ChainIdParameter } from '../types/properties.js'
 import type { Compute, IsNarrowable } from '../types/utils.js'
@@ -38,7 +42,8 @@ export type WaitForTransactionReceiptReturnType<
 >
 
 export type WaitForTransactionReceiptErrorType =
-  viem_WaitForTransactionReceiptErrorType
+  | TransactionRevertedErrorType
+  | viem_WaitForTransactionReceiptErrorType
 
 export async function waitForTransactionReceipt<
   config extends Config,
@@ -58,7 +63,8 @@ export async function waitForTransactionReceipt<
   const receipt = await action({ ...rest, timeout })
 
   if (receipt.status === 'reverted') {
-    throw await withTimeout(
+    // The revert reason, or the error that stopped us from finding it.
+    const cause = await withTimeout(
       async () => {
         const action_getTransaction = getAction(
           client,
@@ -87,7 +93,11 @@ export async function waitForTransactionReceipt<
         timeout: timeout > 0 ? Math.min(timeout, 10_000) : 10_000,
         errorInstance: new Error('unknown reason'),
       },
-    )
+    ).catch((error: Error) => error)
+    throw new TransactionRevertedError({
+      cause,
+      hash: receipt.transactionHash,
+    })
   }
 
   return {

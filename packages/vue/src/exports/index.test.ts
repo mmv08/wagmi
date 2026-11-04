@@ -69,6 +69,7 @@ test('exports', () => {
       "parseCookie",
       "SwitchChainNotSupportedError",
       "serialize",
+      "TransactionRevertedError",
       "unstable_connector",
       "webSocket",
       "version",

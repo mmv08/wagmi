@@ -500,6 +500,8 @@ export {
   SwitchChainNotSupportedError,
   type SwitchChainNotSupportedErrorType,
   serialize,
+  TransactionRevertedError,
+  type TransactionRevertedErrorType,
   type Transport,
   unstable_connector,
   webSocket,

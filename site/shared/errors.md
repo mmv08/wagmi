@@ -88,3 +88,13 @@ When switching chains is not supported by connectors.
 ```ts-vue
 import { SwitchChainNotSupportedError } from '{{packageName}}'
 ```
+
+## Transaction
+
+### TransactionRevertedError
+
+When a transaction's receipt marks it as reverted. `cause` holds the revert reason, or the error that stopped Wagmi from finding it.
+
+```ts-vue
+import { TransactionRevertedError } from '{{packageName}}'
+```

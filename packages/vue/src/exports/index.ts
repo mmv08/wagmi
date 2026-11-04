@@ -290,6 +290,8 @@ export {
   SwitchChainNotSupportedError,
   type SwitchChainNotSupportedErrorType,
   serialize,
+  TransactionRevertedError,
+  type TransactionRevertedErrorType,
   unstable_connector,
   webSocket,
 } from '@wagmi/core'

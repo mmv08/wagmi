@@ -1,3 +1,5 @@
+import { isServer } from '@tanstack/query-core'
+
 import {
   type WaitForTransactionReceiptErrorType,
   type WaitForTransactionReceiptParameters,
@@ -5,6 +7,7 @@ import {
   waitForTransactionReceipt,
 } from '../actions/waitForTransactionReceipt.js'
 import type { Config } from '../createConfig.js'
+import { TransactionRevertedError } from '../errors/transaction.js'
 import type { ScopeKeyParameter } from '../types/properties.js'
 import type { QueryOptions, QueryParameter } from '../types/query.js'
 import type { Compute, ExactPartial } from '../types/utils.js'
@@ -48,7 +51,19 @@ export function waitForTransactionReceiptQueryOptions<
       >
     },
     queryKey: waitForTransactionReceiptQueryKey(options),
+    retry: options.query?.retry ?? retry,
   }
+}
+
+// TanStack Query's default retries (none on the server, 3 in the browser),
+// except for a reverted transaction: each retry would wait for the receipt
+// and replay the transaction again, only to throw the same error.
+function retry(
+  failureCount: number,
+  error: WaitForTransactionReceiptErrorType,
+) {
+  if (error instanceof TransactionRevertedError) return false
+  return failureCount < (isServer ? 0 : 3)
 }
 
 export type WaitForTransactionReceiptQueryFnData<

@@ -15,6 +15,7 @@ test('exports', () => {
       "Hydrate",
       "ProviderNotFoundError",
       "SwitchChainNotSupportedError",
+      "TransactionRevertedError",
       "WagmiContext",
       "WagmiProvider",
       "WagmiProviderNotFoundError",
